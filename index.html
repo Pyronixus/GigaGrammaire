@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GigaGrammaire • Cours & Exercices</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Bulles animées en arrière-plan -->
+    <div class="bg-blur-circle circle-1"></div>
+    <div class="bg-blur-circle circle-2"></div>
+    <div class="bg-blur-circle circle-3"></div>
+
+    <div class="container">
+        
+        <!-- MENU PRINCIPAL (NOUVEAU) -->
+        <div id="main-menu" class="card active">
+            <div class="logo-icon">🎓</div>
+            <h1>GigaGrammaire</h1>
+            <p class="subtitle">Que veux-tu faire aujourd'hui ?</p>
+            
+            <div class="main-options">
+                <button id="to-lessons-btn" class="btn-primary menu-hub-btn">📚 Consulter le Cours</button>
+                <button id="to-exercises-btn" class="btn-secondary menu-hub-btn">⚡ Faire des Exercices</button>
+            </div>
+        </div>
+
+        <!-- MENU CHOIX DU COURS (NOUVEAU) -->
+        <div id="lessons-menu" class="card hidden">
+            <button id="back-to-main-from-lessons" class="btn-text back-btn">⬅ Retour</button>
+            <div class="logo-icon">📖</div>
+            <h1>Fiches de Révision</h1>
+            <p class="subtitle">Sélectionne le thème à réviser</p>
+            
+            <div class="main-options">
+                <button id="lesson-natures-btn" class="btn-primary" style="background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%); box-shadow: 0 8px 20px rgba(56, 189, 248, 0.3);">1. Les Natures</button>
+                <button id="lesson-fonctions-btn" class="btn-primary" style="background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%); box-shadow: 0 8px 20px rgba(244, 63, 94, 0.3);">2. Les Fonctions</button>
+            </div>
+        </div>
+
+        <!-- FICHE DE COURS : NATURES (NOUVEAU) -->
+        <div id="sheet-natures" class="card hidden lesson-sheet">
+            <button id="back-to-lessons-from-natures" class="btn-text back-btn">⬅ Retour aux cours</button>
+            <h2>💎 Les 14 Natures</h2>
+            <p class="subtitle-sheet">Ce que le mot OU le groupe EST (sa carte d'identité fixe).</p>
+            
+            <div class="scroll-box">
+                <div class="sheet-item"><strong>🔹 Nom :</strong> Désigne un être, une chose ou un concept (ex: <i>ordinateur, courage</i>). Il a un genre propre.</div>
+                <div class="sheet-item"><strong>🔹 Déterminant :</strong> Précède le nom et donne son genre/nombre (ex: <i>le, une, ses, ce, aucun</i>).</div>
+                <div class="sheet-item"><strong>🔹 Adjectif qualificatif :</strong> Donne une précision sur le nom (ex: <i>stylé, rapide</i>). S'accorde avec lui.</div>
+                <div class="sheet-item"><strong>🔹 Pronom :</strong> Remplace un nom ou un groupe nominal pour éviter les répétitions (ex: <i>il, le, la, qui, cela</i>).</div>
+                <div class="sheet-item"><strong>🔹 GN (Groupe Nominal) :</strong> Ensemble de mots centré sur un nom noyau (ex: <i>un magnifique projet de code</i>).</div>
+                <div class="sheet-item"><strong>🔹 Groupe prépositionnel :</strong> Groupe de mots introduit obligatoirement par une préposition (ex: <i>à la maison, de mon ami</i>).</div>
+                <div class="sheet-item"><strong>🔹 Verbe :</strong> Cœur de la phrase, il exprime une action ou un état. Se conjugue (ex: <i>apprendre, est</i>).</div>
+                <div class="sheet-item"><strong>🔹 Proposition :</strong> Groupe de mots contenant un verbe conjugué (ex: <i>parce qu'il révise bien</i>).</div>
+                <div class="sheet-item"><strong>🔹 Participe passé :</strong> Forme verbale employée comme adjectif ou avec un auxiliaire (ex: <i>compris, fini, codé</i>).</div>
+                <div class="sheet-item"><strong>🔹 Adverbe :</strong> Mot invariable qui modifie le sens d'un verbe, adj ou autre adverbe (ex: <i>très, rapidement, hier</i>).</div>
+                <div class="sheet-item"><strong>🔹 Conjonction :</strong> Mot invariable reliant deux éléments (Coordination : <i>mais, où, et, donc...</i> | Subordination : <i>que, parce que, quand...</i>).</div>
+                <div class="sheet-item"><strong>🔹 Préposition :</strong> Petit mot invariable introduisant un complément (Astuce : <i>à, dans, par, pour, en, vers, avec, de, sans, sous</i>).</div>
+                <div class="sheet-item"><strong>🔹 Interjonction :</strong> Mot autonome traduisant une émotion ou un cri (ex: <i>Ah !, Ouf !, Bravo !</i>).</div>
+                <div class="sheet-item"><strong>🔹 Participe présent :</strong> Forme verbale invariable se terminant en <b>-ant</b> (ex: <i>en codant, sachant, comprenant</i>).</div>
+            </div>
+        </div>
+
+        <!-- FICHE DE COURS : FONCTIONS (NOUVEAU) -->
+        <div id="sheet-fonctions" class="card hidden lesson-sheet">
+            <button id="back-to-lessons-from-fonctions" class="btn-text back-btn">⬅ Retour aux cours</button>
+            <h2>🔥 Les 10 Fonctions</h2>
+            <p class="subtitle-sheet">Le rôle joué par le mot ou le groupe dans la phrase (son métier temporaire).</p>
+            
+            <div class="scroll-box">
+                <div class="sheet-item"><strong>🔸 Sujet :</strong> Fait l'action ou subit l'état. Répond à : <i>Qui est-ce qui ?</i></div>
+                <div class="sheet-item"><strong>🔸 COD (Complément d'Objet Direct) :</strong> Lié directement au verbe. Répond à : <i>Verbe + Qui / Quoi ?</i></div>
+                <div class="sheet-item"><strong>🔸 COI (Complément d'Objet Indirect) :</strong> Lié au verbe par une préposition. Répond à : <i>Verbe + À qui / À quoi / De qui / De quoi ?</i></div>
+                <div class="sheet-item"><strong>🔸 Attribut du sujet :</strong> Exprime une caractéristique du sujet via un verbe d'état (<i>être, sembler, paraître...</i>). Ex: Il est <i>développeur</i>.</div>
+                <div class="sheet-item">
+                    <strong>🔸 Complément circonstanciel (CC) :</strong> Indique les circonstances. Déplaçable et supprimable. Spécifications :
+                    <ul class="sub-list">
+                        <li>📍 <b>CC de Lieu :</b> Répond à <i>Où ?</i> (ex: dans la chambre)</li>
+                        <li>⏰ <b>CC de Temps :</b> Répond à <i>Quand ?</i> (ex: ce matin)</li>
+                        <li>🎯 <b>CC de But :</b> Répond à <i>Dans quel but ?</i> (ex: pour réussir)</li>
+                        <li>🍏 <b>CC de Cause :</b> Répond à <i>Pourquoi / À cause de quoi ?</i> (ex: par jalousie)</li>
+                        <li>🚲 <b>CC de Manière :</b> Répond à <i>Comment ?</i> (ex: avec soin)</li>
+                    </ul>
+                </div>
+                <div class="sheet-item"><strong>🔸 Complément d'agent :</strong> Dans une phrase passive, c'est celui qui fait réellement l'action. Introduit par <i>par</i> ou <i>de</i> (ex: Le code est lu <i>par la machine</i>).</div>
+                <div class="sheet-item"><strong>🔸 Apposition :</strong> Séparé du mot qu'il qualifie par une virgule (ex: Ce framework, <i>très populaire</i>, fait gagner du temps).</div>
+                <div class="sheet-item"><strong>🔸 Complément de l'antécédent :</strong> Proposition subordonnée relative qui complète un nom placé juste avant (ex: Le livre <i>que je lis</i>).</div>
+                <div class="sheet-item"><strong>🔸 Épithète :</strong> Adjectif placé directement à côté du nom qu'il qualifie (ex: Une interface <i>propre</i>).</div>
+                <div class="sheet-item"><strong>🔸 CDN (Complément du Nom) :</strong> Groupe prépositionnel qui complète un nom (ex: Une tasse <i>de café</i>, un projet <i>de dev</i>).</div>
+            </div>
+        </div>
+
+        <!-- ÉCRAN DE CONFIGURATION (ANCIEN ACCUEIL - INVENTÉ/CONSERVÉ) -->
+        <div id="setup-screen" class="card hidden">
+            <button id="back-to-main-from-setup" class="btn-text back-btn">⬅ Menu</button>
+            <div class="logo-icon">⚡</div>
+            <h1>Configuration</h1>
+            <p class="subtitle">Natures & Fonctions grammaticales</p>
+            
+            <div class="mode-selector">
+                <label class="mode-option">
+                    <input type="radio" name="mode" value="natures" checked>
+                    <span class="mode-box">Natures seules</span>
+                </label>
+                <label class="mode-option">
+                    <input type="radio" name="mode" value="fonctions">
+                    <span class="mode-box">Fonctions seules</span>
+                </label>
+                <label class="mode-option">
+                    <input type="radio" name="mode" value="les deux">
+                    <span class="mode-box">Les deux</span>
+                </label>
+            </div>
+
+            <button id="start-btn" class="btn-primary">C'est parti ! 🚀</button>
+        </div>
+
+        <!-- ÉCRAN DE JEU (SANS CHANGEMENT) -->
+        <div id="game-screen" class="card hidden">
+            <div class="game-header">
+                <div id="progress-track" class="score-badge">Score : 0/0</div>
+                <button id="quit-btn" class="btn-text">Quitter ✖</button>
+            </div>
+
+            <div class="sentence-box">
+                <div id="sentence-container" class="sentence"></div>
+            </div>
+
+            <div id="questions-form">
+                <div id="nature-input-group" class="input-group">
+                    <label id="label-nature" for="input-nature">Nature de "..." :</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="input-nature" placeholder="Ex: nom commun, verbe, adjectif..." autocomplete="off">
+                        <span class="focus-border"></span>
+                    </div>
+                </div>
+
+                <div id="fonction-input-group" class="input-group">
+                    <label id="label-fonction" for="input-fonction">Fonction de "..." :</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="input-fonction" placeholder="Ex: sujet, COD, attribut du sujet..." autocomplete="off">
+                        <span class="focus-border"></span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button id="submit-btn" class="btn-primary">Vérifier ✨</button>
+                    <button id="hint-btn" class="btn-secondary">Un indice ? 💡</button>
+                </div>
+            </div>
+
+            <div id="hint-zone" class="hint-box hidden"></div>
+            <div id="feedback-zone" class="feedback-box hidden"></div>
+            
+            <button id="next-btn" class="btn-next hidden">Phrase suivante ➜</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
