@@ -191,7 +191,7 @@ h1 {
   font-size: 1.1rem;
   font-weight: 800;
   color: #fff;
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #6365f1b1 0%, #4e46e5b8 100%);
   box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -199,11 +199,11 @@ h1 {
 
 .btn-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 24px rgba(99, 102, 241, 0.6);
+  box-shadow: 0 12px 24px rgba(99, 102, 241, 0.4);
 }
 
 .btn-primary:active {
-  transform: translateY(-1px);
+  transform: translateY(-3 px);
 }
 
 .btn-secondary {
@@ -219,8 +219,103 @@ h1 {
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(-1deg);
+  background: rgba(255, 255, 255, 0.2);
   border-color: var(--text-muted);
+  transition: all 0.4s ease;
+}
+
+.btn-secondary:active {
+  transform: translateX(-1px);
+}
+
+.btn-tertiary {
+  padding: 16px 25px;
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  background: grey;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.stats-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.stats-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.period-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.period-btn {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-main);
+  border-radius: 14px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.period-btn:hover,
+.period-btn.active {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.5);
+}
+
+.stats-summary {
+  margin-top: 22px;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stats-summary div {
+  color: var(--text-main);
+  font-size: 0.95rem;
+}
+
+.chart-box {
+  margin-top: 20px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.chart-box canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.btn-tertiary:hover {
+  filter: brightness(1.2);
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+}
+
+.btn-tertiary:active {
+  transform: translateX(-1px);
 }
 
 .btn-text {
@@ -503,6 +598,14 @@ input[type="text"]:focus {
   .sheet-item {
     font-size: 0.92rem;
   }
+
+  .item-example {
+    font-size: 0.85rem;
+    color: rgba(203, 213, 225, 0.9);
+    display: block;
+    margin-top: 8px;
+    font-style: italic;
+  }
 }
 
 /* Styles spécifiques aux fiches de cours */
@@ -557,16 +660,26 @@ input[type="text"]:focus {
 }
 
 .sheet-item {
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.04);
   padding: 14px 18px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   font-size: 0.95rem;
   line-height: 1.5;
 }
 
 .sheet-item strong {
   color: #fff;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.item-example {
+  font-size: 0.92rem;
+  color: rgba(203, 213, 225, 0.9);
+  display: block;
+  margin-top: 8px;
+  font-style: italic;
 }
 
 .sub-list {
