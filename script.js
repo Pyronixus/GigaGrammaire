@@ -49,6 +49,7 @@ const feedbackZone = document.getElementById("feedback-zone");
 const progressTrack = document.getElementById("progress-track");
 const statsBtn = document.getElementById("stats-btn");
 const toStatsBtn = document.getElementById("to-stats-btn");
+const progressSummary = document.getElementById("progress-summary");
 const statsScreen = document.getElementById("stats-screen");
 const backToGameFromStats = document.getElementById("back-to-game-from-stats");
 const resetStatsBtn = document.getElementById("reset-stats-btn");
@@ -430,14 +431,30 @@ function loadStats() {
   if (stored) {
     try {
       statsEntries = JSON.parse(stored);
+      if (!Array.isArray(statsEntries)) throw new Error("Données invalides");
     } catch (e) {
       statsEntries = [];
     }
   }
+  updateProgressSummary();
 }
 
 function saveStats() {
   localStorage.setItem(statsKey, JSON.stringify(statsEntries));
+  updateProgressSummary();
+}
+
+function updateProgressSummary() {
+  if (!progressSummary) return;
+  const totalAttempts = statsEntries.length;
+  const totalCorrect = statsEntries.filter((item) => item.correct).length;
+  if (totalAttempts === 0) {
+    progressSummary.textContent =
+      "Évolution sauvegardée : aucune donnée pour l’instant.";
+    return;
+  }
+  const rate = Math.round((totalCorrect / totalAttempts) * 100);
+  progressSummary.textContent = `Évolution sauvegardée : ${totalAttempts} essais, ${totalCorrect} réussites, taux ${rate}%`;
 }
 
 function addStatsEntry(correct) {
@@ -460,6 +477,7 @@ function resetStats() {
     saveStats();
   }
   updateStatsPanel();
+  updateProgressSummary();
 }
 
 function getPeriodStart(period) {
