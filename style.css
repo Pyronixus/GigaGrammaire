@@ -121,9 +121,28 @@ body {
 
 /* --- ÉCRAN D'ACCUEIL --- */
 .logo-icon {
-  font-size: 3rem;
-  margin-bottom: 10px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 10px;
   animation: pulse 2s infinite;
+}
+
+.logo-icon img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.logo-icon-text {
+  font-size: 3rem;
+  font-weight: 800;
+  background: linear-gradient(to right, #fff, #94a3b8);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 h1 {
@@ -569,7 +588,12 @@ input[type="text"]:focus {
   }
 
   .logo-icon {
-    font-size: 2.4rem;
+    width: 80px;
+    height: 80px;
+  }
+
+  .logo-icon-text {
+    font-size: 2.5rem;
   }
 
   .card {
@@ -585,26 +609,46 @@ input[type="text"]:focus {
     margin-bottom: 14px;
   }
 
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .subtitle,
+  .subtitle-sheet {
+    font-size: 0.92rem;
+  }
+
+  .sentence {
+    font-size: 1.05rem;
+  }
+
   .btn-primary,
   .btn-secondary,
   .btn-next {
-    font-size: 1rem;
+    font-size: 0.92rem;
   }
 
   input[type="text"] {
     padding: 14px;
+    font-size: 0.95rem;
   }
 
   .sheet-item {
-    font-size: 0.92rem;
+    font-size: 0.88rem;
   }
 
   .item-example {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: rgba(203, 213, 225, 0.9);
     display: block;
     margin-top: 8px;
     font-style: italic;
+  }
+
+  .period-btn,
+  .stats-summary div,
+  .btn-text {
+    font-size: 0.88rem;
   }
 }
 

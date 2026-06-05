@@ -26,7 +26,7 @@ const compliments = [
   "Tu as le 'mot' pour rire, mais surtout le mot juste ! 💡",
   "Exceptionnel ! Même les règles de grammaire n'ont pas d'exception face à toi ! 🛡️",
   "Tu es en mode 'compilation' de succès ! 🚀",
-  "Zéro faute, 100% de génie : le compte est bon ! 🧠"
+  "Zéro faute, 100% de génie : le compte est bon ! 🧠",
 ];
 
 // --- ÉLÉMENTS DOM EXISTANTS ---
@@ -196,7 +196,7 @@ window.addEventListener("resize", () => {
 
 async function loadDatabase() {
   try {
-    const response = await fetch("sentences.json");
+    const response = await fetch("assets/sentences.json");
     if (!response.ok) throw new Error("Impossible de charger le fichier JSON");
     phrasesDb = await response.json();
   } catch (error) {
@@ -250,8 +250,23 @@ function loadNewQuestion() {
 
   if (validQuestions.length === 0) return;
 
-  const randomPick =
+  let randomPick =
     validQuestions[Math.floor(Math.random() * validQuestions.length)];
+
+  if (currentQuestion && validQuestions.length > 1) {
+    let attempts = 0;
+    while (
+      randomPick.sentence === currentSentenceText &&
+      randomPick.questionData.target === currentQuestion.target &&
+      randomPick.questionData.type === currentQuestion.type &&
+      attempts < 10
+    ) {
+      randomPick =
+        validQuestions[Math.floor(Math.random() * validQuestions.length)];
+      attempts++;
+    }
+  }
+
   currentSentenceText = randomPick.sentence;
   currentQuestion = randomPick.questionData;
 
