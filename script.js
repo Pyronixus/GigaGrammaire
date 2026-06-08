@@ -135,7 +135,7 @@ lessonFonctionsBtn.addEventListener("click", () => {
   sheetFonctions.classList.remove("hidden");
 });
 
-// --- LOGIQUE ANCIENNE DE L'EXERCICE (INCHANGÉE) ---
+// --- LOGIQUE DES EXERCICES ---
 
 startBtn.addEventListener("click", startGame);
 quitBtn.addEventListener("click", quitGame);
@@ -276,7 +276,7 @@ function loadNewQuestion() {
   if (currentQuestion.type === "nature") {
     natureGroup.classList.remove("hidden");
     fonctionGroup.classList.add("hidden");
-    labelNature.innerHTML = `Nature du ${isMultiWord ? "groupe de mots" : "mot"} <span class="highlight-nature">"${currentQuestion.target}"</span> :`;
+    labelNature.innerHTML = `Quelle est la <strong>nature</strong> du ${isMultiWord ? "groupe de mots" : "mot"} <span class="highlight-nature">"${currentQuestion.target}"</span> ?`;
     sentenceContainer.innerHTML = currentSentenceText.replace(
       currentQuestion.target,
       `<span class="highlight-nature">${currentQuestion.target}</span>`,
@@ -285,7 +285,7 @@ function loadNewQuestion() {
   } else if (currentQuestion.type === "fonction") {
     natureGroup.classList.add("hidden");
     fonctionGroup.classList.remove("hidden");
-    labelFonction.innerHTML = `Fonction du ${isMultiWord ? "groupe de mots" : "mot"} <span class="highlight-fonction">"${currentQuestion.target}"</span> :`;
+    labelFonction.innerHTML = `Quelle est la <strong>fonction</strong> du ${isMultiWord ? "groupe de mots" : "mot"} <span class="highlight-fonction">"${currentQuestion.target}"</span> ?`;
     sentenceContainer.innerHTML = currentSentenceText.replace(
       currentQuestion.target,
       `<span class="highlight-fonction">${currentQuestion.target}</span>`,

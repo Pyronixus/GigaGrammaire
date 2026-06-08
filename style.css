@@ -186,18 +186,18 @@ h1 {
   border-radius: 14px;
   font-weight: 600;
   color: var(--text-main);
-  transition: all 0.3s ease;
 }
 
 .mode-option input:checked + .mode-box {
   background: var(--glass-accent);
   border-color: var(--primary-color);
   box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
-  transform: scale(1.02);
+  transform: scale(1.03);
 }
 
 .mode-box:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
 }
 
 /* --- BOUTONS --- */
@@ -238,7 +238,7 @@ h1 {
 }
 
 .btn-secondary:hover {
-  transform: rotate(-1deg);
+  transform:scale(1.05);
   background: rgba(255, 255, 255, 0.2);
   border-color: var(--text-muted);
   transition: all 0.4s ease;
@@ -444,10 +444,18 @@ input[type="text"]:focus {
 
 .sentence-box {
   background: rgba(15, 23, 42, 0.9);
-  border-left: 5px solid rgba(99, 102, 241, 0.85);
+  border-left: 4px solid rgba(99, 102, 241, 0.85);
   padding: 24px;
   border-radius: 22px;
   margin-bottom: 30px;
+  /* ASTUCE : On place la transition ici pour qu'elle s'exécute au survol ET quand la souris sort de l'élément */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sentence-box:hover {
+  border-left-color: rgba(99, 102, 241, 1);
+  /* Ombre localisée uniquement à gauche */
+  box-shadow: -12px 0 15px -8px rgba(99, 102, 241, 0.6);
 }
 
 /* --- BOX DE FEEDBACK ET INDICES --- */
