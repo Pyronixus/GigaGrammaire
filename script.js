@@ -208,9 +208,14 @@ loadDatabase();
 loadStats();
 
 function startGame() {
-  if (phrasesDb.length === 0) return;
+  if (!phrasesDb || phrasesDb.length === 0) {
+    alert("La base de données n'est pas chargée.");
+    return;
+  }
 
+  // Récupère la valeur cochée ("nature", "fonction" ou "les deux")
   currentMode = document.querySelector('input[name="mode"]:checked').value;
+
   score = 0;
   totalQuestions = 0;
   sessionStatsEntries = [];
@@ -228,6 +233,7 @@ function quitGame() {
 }
 
 function loadNewQuestion() {
+  // 1. Réinitialisation complète de l'interface graphique et des inputs
   inputNature.value = "";
   inputFonction.value = "";
   hintZone.classList.add("hidden");
@@ -236,56 +242,118 @@ function loadNewQuestion() {
   submitBtn.classList.remove("hidden");
   hintBtn.classList.remove("hidden");
 
-  let validQuestions = [];
+  if (!phrasesDb || phrasesDb.length === 0) return;
 
-  phrasesDb.forEach((item) => {
-    item.questions.forEach((q) => {
-      if (currentMode === "les deux" || q.type === currentMode) {
-        validQuestions.push({
-          sentence: item.sentence,
-          questionData: q,
-        });
-      }
+  let chosenSentenceObj = null;
+  let chosenQuestion = null;
+  let attempts = 0;
+
+  // 2. Recherche en temps réel ("pendant") dans la base de données
+  while (attempts < 100) {
+    // Sélection d'une phrase au hasard
+    let randomSentence =
+      phrasesDb[Math.floor(Math.random() * phrasesDb.length)];
+
+    // Filtrage des questions de cette phrase précise
+    let matchingQuestions = randomSentence.questions.filter((q) => {
+      // Normalisation pour accepter "nature" / "natures" et "fonction" / "fonctions"
+      let modeNettoyé = currentMode.trim().toLowerCase();
+      let typeNettoyé = q.type.trim().toLowerCase();
+
+      if (modeNettoyé === "les deux") return true;
+      if (modeNettoyé.startsWith("nature") && typeNettoyé.startsWith("nature"))
+        return true;
+      if (
+        modeNettoyé.startsWith("fonction") &&
+        typeNettoyé.startsWith("fonction")
+      )
+        return true;
+
+      return typeNettoyé === modeNettoyé;
     });
-  });
 
-  if (validQuestions.length === 0) return;
+    // Si la phrase contient une question qui correspond au mode
+    if (matchingQuestions.length > 0) {
+      let candidateQuestion =
+        matchingQuestions[Math.floor(Math.random() * matchingQuestions.length)];
 
-  let randomPick =
-    validQuestions[Math.floor(Math.random() * validQuestions.length)];
+      // Sécurité anti-répétition si la base a plusieurs phrases
+      if (currentQuestion && phrasesDb.length > 1) {
+        if (
+          randomSentence.sentence === currentSentenceText &&
+          candidateQuestion.target === currentQuestion.target
+        ) {
+          attempts++;
+          continue; // Même phrase et même mot ciblé, on force une autre pioche
+        }
+      }
 
-  if (currentQuestion && validQuestions.length > 1) {
-    let attempts = 0;
-    while (
-      randomPick.sentence === currentSentenceText &&
-      randomPick.questionData.target === currentQuestion.target &&
-      randomPick.questionData.type === currentQuestion.type &&
-      attempts < 10
-    ) {
-      randomPick =
-        validQuestions[Math.floor(Math.random() * validQuestions.length)];
-      attempts++;
+      chosenSentenceObj = randomSentence;
+      chosenQuestion = candidateQuestion;
+      break; // Question trouvée !
+    }
+    attempts++;
+  }
+
+  // 3. Sécurité de secours si la boucle aléatoire n'a rien donné
+  if (!chosenQuestion) {
+    for (let item of phrasesDb) {
+      let match = item.questions.find((q) => {
+        let modeNettoyé = currentMode.trim().toLowerCase();
+        let typeNettoyé = q.type.trim().toLowerCase();
+        if (modeNettoyé === "les deux") return true;
+        if (
+          modeNettoyé.startsWith("nature") &&
+          typeNettoyé.startsWith("nature")
+        )
+          return true;
+        if (
+          modeNettoyé.startsWith("fonction") &&
+          typeNettoyé.startsWith("fonction")
+        )
+          return true;
+        return typeNettoyé === modeNettoyé;
+      });
+      if (match) {
+        chosenSentenceObj = item;
+        chosenQuestion = match;
+        break;
+      }
     }
   }
 
-  currentSentenceText = randomPick.sentence;
-  currentQuestion = randomPick.questionData;
+  // 4. Message d'erreur clair si rien ne correspond
+  if (!chosenQuestion) {
+    alert(
+      `Aucune question trouvée pour le mode "${currentMode}". Vérifie l'orthographe des types dans ton fichier sentences.json.`,
+    );
+    quitGame();
+    return;
+  }
+
+  // Sauvegarde dans les variables d'état globales
+  currentSentenceText = chosenSentenceObj.sentence;
+  currentQuestion = chosenQuestion;
 
   const isMultiWord = currentQuestion.target.trim().includes(" ");
 
-  if (currentQuestion.type === "nature") {
+  // Normalisation du type pour l'affichage de l'interface
+  let typeQuestion = currentQuestion.type.trim().toLowerCase();
+
+  // 5. Configuration dynamique de l'affichage de l'interface
+  if (typeQuestion.startsWith("nature")) {
     natureGroup.classList.remove("hidden");
     fonctionGroup.classList.add("hidden");
-    labelNature.innerHTML = `Quelle est la <strong>nature</strong> du ${isMultiWord ? "groupe de mots" : "mot"} <span class="highlight-nature">"${currentQuestion.target}"</span> ?`;
+    labelNature.innerHTML = `Quelle est la <strong class="enhance-word">nature</strong> du ${isMultiWord ? "groupe de mots" : "mot"} <span class="highlight-nature">"${currentQuestion.target}"</span> ?`;
     sentenceContainer.innerHTML = currentSentenceText.replace(
       currentQuestion.target,
       `<span class="highlight-nature">${currentQuestion.target}</span>`,
     );
     setTimeout(() => inputNature.focus(), 50);
-  } else if (currentQuestion.type === "fonction") {
+  } else if (typeQuestion.startsWith("fonction")) {
     natureGroup.classList.add("hidden");
     fonctionGroup.classList.remove("hidden");
-    labelFonction.innerHTML = `Quelle est la <strong>fonction</strong> du ${isMultiWord ? "groupe de mots" : "mot"} <span class="highlight-fonction">"${currentQuestion.target}"</span> ?`;
+    labelFonction.innerHTML = `Quelle est la <strong class="enhance-word">fonction</strong> du ${isMultiWord ? "groupe de mots" : "mot"} <span class="highlight-fonction">"${currentQuestion.target}"</span> ?`;
     sentenceContainer.innerHTML = currentSentenceText.replace(
       currentQuestion.target,
       `<span class="highlight-fonction">${currentQuestion.target}</span>`,
@@ -361,28 +429,39 @@ function getCompletionHint(answer) {
 
 function checkAnswers() {
   let userAnswer = "";
-  if (currentQuestion.type === "nature") {
+  let typeQuestion = currentQuestion.type.trim().toLowerCase();
+
+  // 1. Récupération stricte de la valeur du champ qui est actif à l'écran
+  if (typeQuestion.startsWith("nature")) {
     userAnswer = cleanString(inputNature.value);
   } else {
     userAnswer = cleanString(inputFonction.value);
   }
 
+  // Si l'utilisateur n'a rien écrit, on ne fait rien
   if (userAnswer === "") return;
 
   totalQuestions++;
   let isCorrect = false;
   const expectedAnswer = cleanString(currentQuestion.answer);
 
+  // 2. CORRECTION DE LA LOGIQUE DE VALIDATION
   if (isIncompleteAnswer(userAnswer, expectedAnswer)) {
     feedbackZone.className = "feedback-box wrong";
     feedbackZone.innerHTML = `<strong>Réponse incomplète.</strong> Précise ta réponse comme : <em>${getCompletionHint(currentQuestion.answer)}</em>.`;
+  } else if (userAnswer === expectedAnswer) {
+    // Égalité parfaite après nettoyage (gère les majuscules et accents)
+    isCorrect = true;
   } else if (
-    userAnswer.includes(expectedAnswer) ||
-    expectedAnswer.includes(userAnswer)
+    expectedAnswer.length > 4 &&
+    (userAnswer.includes(expectedAnswer) || expectedAnswer.includes(userAnswer))
   ) {
+    // Tolérance uniquement pour les réponses longues (ex: "complément d'objet" au lieu de "complément d'objet direct")
+    // Cela empêche qu'une seule lettre comme "e", "a" ou "le" soit validée par erreur
     isCorrect = true;
   }
 
+  // 3. Traitement du résultat et affichage du feedback
   if (isCorrect) {
     score++;
     const randomCompliment =

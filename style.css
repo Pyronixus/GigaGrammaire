@@ -498,6 +498,11 @@ h1 {
   color: var(--text-muted);
 }
 
+.enhance-word {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
 .input-wrapper {
   position: relative;
 }
