@@ -120,6 +120,14 @@ body {
 }
 
 /* --- ÉCRAN D'ACCUEIL --- */
+#logo:hover {
+  filter: brightness(1.2);
+  transform: scale(1.1);
+  transition:
+    filter 0.3s ease,
+    transform 0.3s ease;
+}
+
 .logo-icon {
   display: inline-flex;
   justify-content: center;
@@ -143,6 +151,52 @@ body {
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.glow {
+  position: relative;
+  display: block;
+  transition: filter 0.3s ease; /* Transition fluide pour la lueur */
+  cursor: default;
+}
+
+/* Effet au survol : On active le dégradé animé ET la lueur parfaite */
+.glow:hover {
+  background: linear-gradient(
+    45deg,
+    #ff0000,
+    #ff7300,
+    #fffb00,
+    #48ff00,
+    #00ffd5,
+    #002bff,
+    #ff00c8,
+    #ff0000
+  );
+  background-size: 600%;
+  -webkit-background-clip: text; /* Découpe le fond selon la forme des lettres */
+  background-clip: text;
+
+  /* L'ANIMATION DU TEXTE */
+  animation: glowingText 10s linear infinite;
+
+  /* LA LUEUR PARFAITE : Elle suit les contours des lettres */
+  /* On superpose deux ombres pour intensifier l'effet sans faire de gros paquets */
+  filter: drop-shadow(0 0 8px rgba(255, 115, 0, 0.6))
+    drop-shadow(0 0 20px rgba(0, 255, 213, 0.4));
+}
+
+/* Animation unique pour faire défiler le dégradé dans le texte */
+@keyframes glowingText {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 h1 {
@@ -179,6 +233,8 @@ h1 {
 }
 
 .mode-box {
+  position: relative;
+  overflow: hidden;
   display: block;
   padding: 16px;
   background: rgba(255, 255, 255, 0.03);
@@ -188,15 +244,44 @@ h1 {
   color: var(--text-main);
 }
 
+.mode-option input:checked + .mode-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%; /* Départ hors du champ à gauche */
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  animation: shine 1s forwards;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes shine {
+  100% {
+    left: 200%;
+  }
+}
+
 .mode-option input:checked + .mode-box {
   background: var(--glass-accent);
   border-color: var(--primary-color);
   box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
-  transform: scale(1.03);
+  transform: scale(1.02);
+  transition: all 0.5s ease;
 }
 
-.mode-box:hover {
-  background: rgba(255, 255, 255, 0.1);
+.mode-option input:not(:checked) + .mode-box:hover {
+  color: #4f46e5;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+  transform: scale(1.02);
   transition: all 0.3s ease;
 }
 
@@ -238,7 +323,7 @@ h1 {
 }
 
 .btn-secondary:hover {
-  transform:scale(1.05);
+  transform: scale(1.05);
   background: rgba(255, 255, 255, 0.2);
   border-color: var(--text-muted);
   transition: all 0.4s ease;
@@ -255,7 +340,7 @@ h1 {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-main);
-  background: grey;
+  background-color: rgba(255, 255, 255, 0.1);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -449,7 +534,9 @@ input[type="text"]:focus {
   border-radius: 22px;
   margin-bottom: 30px;
   /* ASTUCE : On place la transition ici pour qu'elle s'exécute au survol ET quand la souris sort de l'élément */
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .sentence-box:hover {

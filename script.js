@@ -450,11 +450,11 @@ function updateProgressSummary() {
   const totalCorrect = statsEntries.filter((item) => item.correct).length;
   if (totalAttempts === 0) {
     progressSummary.textContent =
-      "Évolution sauvegardée : aucune donnée pour l’instant.";
+      "✅ (sauvegardé) aucune donnée pour l’instant.";
     return;
   }
   const rate = Math.round((totalCorrect / totalAttempts) * 100);
-  progressSummary.textContent = `Évolution sauvegardée : ${totalAttempts} essais, ${totalCorrect} réussites, taux ${rate}%`;
+  progressSummary.textContent = `✅ ${totalAttempts} essais, ${totalCorrect} réussites, taux ${rate}%`;
 }
 
 function addStatsEntry(correct) {
