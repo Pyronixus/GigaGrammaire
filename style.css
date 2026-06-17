@@ -156,7 +156,7 @@ body {
 .glow {
   position: relative;
   display: block;
-  transition: filter 0.3s ease; /* Transition fluide pour la lueur */
+  transition: filter 1s ease; /* Transition fluide pour la lueur */
   cursor: default;
 }
 

@@ -5,6 +5,8 @@ let currentQuestion = null;
 let currentSentenceText = "";
 let score = 0;
 let totalQuestions = 0;
+let questionsPool = [];
+let poolIndex = 0;
 
 const compliments = [
   "Excellent !",
@@ -213,13 +215,57 @@ function startGame() {
     return;
   }
 
-  // Récupère la valeur cochée ("nature", "fonction" ou "les deux")
   currentMode = document.querySelector('input[name="mode"]:checked').value;
-
   score = 0;
   totalQuestions = 0;
   sessionStatsEntries = [];
   updateScoreDisplay();
+
+  // --- CRÉATION ET MÉLANGE DU POOL DE QUESTIONS ---
+  questionsPool = [];
+  phrasesDb.forEach((sentenceObj) => {
+    sentenceObj.questions.forEach((q) => {
+      let modeNettoyé = currentMode.trim().toLowerCase();
+      let typeNettoyé = q.type.trim().toLowerCase();
+
+      let match = false;
+      if (modeNettoyé === "les deux") match = true;
+      else if (
+        modeNettoyé.startsWith("nature") &&
+        typeNettoyé.startsWith("nature")
+      )
+        match = true;
+      else if (
+        modeNettoyé.startsWith("fonction") &&
+        typeNettoyé.startsWith("fonction")
+      )
+        match = true;
+      else if (typeNettoyé === modeNettoyé) match = true;
+
+      if (match) {
+        // On stocke la question ET la phrase parente pour l'affichage
+        questionsPool.push({
+          sentence: sentenceObj.sentence,
+          question: q,
+        });
+      }
+    });
+  });
+
+  if (questionsPool.length === 0) {
+    alert(
+      `Aucune question trouvée pour le mode "${currentMode}". Vérifie ton fichier sentences.json.`,
+    );
+    return;
+  }
+
+  // Algorithme de Fisher-Yates pour mélanger efficacement le pool
+  for (let i = questionsPool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [questionsPool[i], questionsPool[j]] = [questionsPool[j], questionsPool[i]];
+  }
+
+  poolIndex = 0; // On commence au début du pool mélangé
 
   setupScreen.classList.add("hidden");
   gameScreen.classList.remove("hidden");
@@ -242,105 +288,33 @@ function loadNewQuestion() {
   submitBtn.classList.remove("hidden");
   hintBtn.classList.remove("hidden");
 
-  if (!phrasesDb || phrasesDb.length === 0) return;
+  // Sécurité si le pool est vide
+  if (!questionsPool || questionsPool.length === 0) return;
 
-  let chosenSentenceObj = null;
-  let chosenQuestion = null;
-  let attempts = 0;
-
-  // 2. Recherche en temps réel ("pendant") dans la base de données
-  while (attempts < 100) {
-    // Sélection d'une phrase au hasard
-    let randomSentence =
-      phrasesDb[Math.floor(Math.random() * phrasesDb.length)];
-
-    // Filtrage des questions de cette phrase précise
-    let matchingQuestions = randomSentence.questions.filter((q) => {
-      // Normalisation pour accepter "nature" / "natures" et "fonction" / "fonctions"
-      let modeNettoyé = currentMode.trim().toLowerCase();
-      let typeNettoyé = q.type.trim().toLowerCase();
-
-      if (modeNettoyé === "les deux") return true;
-      if (modeNettoyé.startsWith("nature") && typeNettoyé.startsWith("nature"))
-        return true;
-      if (
-        modeNettoyé.startsWith("fonction") &&
-        typeNettoyé.startsWith("fonction")
-      )
-        return true;
-
-      return typeNettoyé === modeNettoyé;
-    });
-
-    // Si la phrase contient une question qui correspond au mode
-    if (matchingQuestions.length > 0) {
-      let candidateQuestion =
-        matchingQuestions[Math.floor(Math.random() * matchingQuestions.length)];
-
-      // Sécurité anti-répétition si la base a plusieurs phrases
-      if (currentQuestion && phrasesDb.length > 1) {
-        if (
-          randomSentence.sentence === currentSentenceText &&
-          candidateQuestion.target === currentQuestion.target
-        ) {
-          attempts++;
-          continue; // Même phrase et même mot ciblé, on force une autre pioche
-        }
-      }
-
-      chosenSentenceObj = randomSentence;
-      chosenQuestion = candidateQuestion;
-      break; // Question trouvée !
-    }
-    attempts++;
-  }
-
-  // 3. Sécurité de secours si la boucle aléatoire n'a rien donné
-  if (!chosenQuestion) {
-    for (let item of phrasesDb) {
-      let match = item.questions.find((q) => {
-        let modeNettoyé = currentMode.trim().toLowerCase();
-        let typeNettoyé = q.type.trim().toLowerCase();
-        if (modeNettoyé === "les deux") return true;
-        if (
-          modeNettoyé.startsWith("nature") &&
-          typeNettoyé.startsWith("nature")
-        )
-          return true;
-        if (
-          modeNettoyé.startsWith("fonction") &&
-          typeNettoyé.startsWith("fonction")
-        )
-          return true;
-        return typeNettoyé === modeNettoyé;
-      });
-      if (match) {
-        chosenSentenceObj = item;
-        chosenQuestion = match;
-        break;
-      }
+  // 2. Si on a fait le tour du pool, on le remélange pour ne pas bloquer le joueur
+  if (poolIndex >= questionsPool.length) {
+    poolIndex = 0;
+    for (let i = questionsPool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [questionsPool[i], questionsPool[j]] = [
+        questionsPool[j],
+        questionsPool[i],
+      ];
     }
   }
 
-  // 4. Message d'erreur clair si rien ne correspond
-  if (!chosenQuestion) {
-    alert(
-      `Aucune question trouvée pour le mode "${currentMode}". Vérifie l'orthographe des types dans ton fichier sentences.json.`,
-    );
-    quitGame();
-    return;
-  }
+  // 3. Sélection de la question sans aucun doublon possible
+  const currentItem = questionsPool[poolIndex];
+  currentSentenceText = currentItem.sentence;
+  currentQuestion = currentItem.question;
 
-  // Sauvegarde dans les variables d'état globales
-  currentSentenceText = chosenSentenceObj.sentence;
-  currentQuestion = chosenQuestion;
+  // On incrémente l'index pour la prochaine fois
+  poolIndex++;
 
   const isMultiWord = currentQuestion.target.trim().includes(" ");
-
-  // Normalisation du type pour l'affichage de l'interface
   let typeQuestion = currentQuestion.type.trim().toLowerCase();
 
-  // 5. Configuration dynamique de l'affichage de l'interface
+  // 4. Configuration dynamique de l'affichage de l'interface
   if (typeQuestion.startsWith("nature")) {
     natureGroup.classList.remove("hidden");
     fonctionGroup.classList.add("hidden");
@@ -349,6 +323,7 @@ function loadNewQuestion() {
       currentQuestion.target,
       `<span class="highlight-nature">${currentQuestion.target}</span>`,
     );
+    inputNature.value = ""; // Force le clean
     setTimeout(() => inputNature.focus(), 50);
   } else if (typeQuestion.startsWith("fonction")) {
     natureGroup.classList.add("hidden");
@@ -358,6 +333,7 @@ function loadNewQuestion() {
       currentQuestion.target,
       `<span class="highlight-fonction">${currentQuestion.target}</span>`,
     );
+    inputFonction.value = ""; // Force le clean
     setTimeout(() => inputFonction.focus(), 50);
   }
 }
@@ -431,33 +407,96 @@ function checkAnswers() {
   let userAnswer = "";
   let typeQuestion = currentQuestion.type.trim().toLowerCase();
 
-  // 1. Récupération stricte de la valeur du champ qui est actif à l'écran
+  // 1. Récupération de la valeur du champ actif
   if (typeQuestion.startsWith("nature")) {
     userAnswer = cleanString(inputNature.value);
   } else {
     userAnswer = cleanString(inputFonction.value);
   }
 
-  // Si l'utilisateur n'a rien écrit, on ne fait rien
-  if (userAnswer === "") return;
+  // Si le champ est complètement vide
+  if (userAnswer === "") {
+    feedbackZone.className = "feedback-box wrong";
+    feedbackZone.innerHTML = "<strong>Réponse manquante.</strong>";
+    feedbackZone.classList.remove("hidden");
+    return;
+  }
 
   totalQuestions++;
   let isCorrect = false;
+  let isAnIncompleteAnswer = false;
   const expectedAnswer = cleanString(currentQuestion.answer);
 
-  // 2. CORRECTION DE LA LOGIQUE DE VALIDATION
-  if (isIncompleteAnswer(userAnswer, expectedAnswer)) {
-    feedbackZone.className = "feedback-box wrong";
-    feedbackZone.innerHTML = `<strong>Réponse incomplète.</strong> Précise ta réponse comme : <em>${getCompletionHint(currentQuestion.answer)}</em>.`;
-  } else if (userAnswer === expectedAnswer) {
-    // Égalité parfaite après nettoyage (gère les majuscules et accents)
+  // --- SÉCURITÉ : LISTES DE CONTRÔLE POUR ÉVITER LES FAUX POSITIFS ---
+  const listeNatures = [
+    "adjectif",
+    "nom",
+    "verbe",
+    "determinant",
+    "adverbe",
+    "pronom",
+    "conjonction",
+    "interjection",
+    "gn",
+    "proposition",
+  ];
+  const listeFonctions = [
+    "sujet",
+    "cod",
+    "coi",
+    "cc",
+    "attribut",
+    "apposition",
+    "epithete",
+    "cdn",
+    "complement",
+  ];
+
+  // 2. LOGIQUE DE VALIDATION SÉCURISÉE
+
+  // Cas 1 : Détecter si l'élève confond Nature et Fonction (Erreur fatale -> Faux)
+  if (
+    typeQuestion.startsWith("fonction") &&
+    listeNatures.some(
+      (nature) =>
+        userAnswer.includes(nature) && !expectedAnswer.includes(nature),
+    )
+  ) {
+    isCorrect = false;
+  } else if (
+    typeQuestion.startsWith("nature") &&
+    listeFonctions.some(
+      (fonction) =>
+        userAnswer.includes(fonction) && !expectedAnswer.includes(fonction),
+    )
+  ) {
+    isCorrect = false;
+  }
+  // Cas 2 : Égalité parfaite
+  else if (userAnswer === expectedAnswer) {
+    isCorrect = true;
+  }
+  // Cas 3 : Gestion des réponses VRAIMENT incomplètes (ex: l'élève écrit juste "cc" ou "cdn")
+  else if (
+    isIncompleteAnswer(userAnswer, expectedAnswer) &&
+    userAnswer !== expectedAnswer
+  ) {
+    isAnIncompleteAnswer = true;
+  }
+  // Cas 4 : L'utilisateur est PLUS précis que la bdd (ex: "adjectif qualificatif" pour "adjectif")
+  else if (userAnswer.includes(expectedAnswer)) {
+    isCorrect = true;
+  }
+  // Cas 5 : Raccourcis tolérés
+  else if (
+    expectedAnswer === "adjectif qualificatif" &&
+    userAnswer === "adjectif"
+  ) {
     isCorrect = true;
   } else if (
-    expectedAnswer.length > 4 &&
-    (userAnswer.includes(expectedAnswer) || expectedAnswer.includes(userAnswer))
+    expectedAnswer === "conjonction de subordination" &&
+    userAnswer === "conjonction"
   ) {
-    // Tolérance uniquement pour les réponses longues (ex: "complément d'objet" au lieu de "complément d'objet direct")
-    // Cela empêche qu'une seule lettre comme "e", "a" ou "le" soit validée par erreur
     isCorrect = true;
   }
 
@@ -468,7 +507,10 @@ function checkAnswers() {
       compliments[Math.floor(Math.random() * compliments.length)];
     feedbackZone.className = "feedback-box correct";
     feedbackZone.innerHTML = `<strong>${randomCompliment}</strong> C'est tout à fait ça !`;
-  } else if (!feedbackZone.classList.contains("wrong")) {
+  } else if (isAnIncompleteAnswer) {
+    feedbackZone.className = "feedback-box wrong"; // Reste rouge ou orange selon ton CSS
+    feedbackZone.innerHTML = `<strong>Réponse incomplète.</strong> Précise ta réponse comme : <em>${getCompletionHint(currentQuestion.answer)}</em>.`;
+  } else {
     feedbackZone.className = "feedback-box wrong";
     feedbackZone.innerHTML = `<strong>Oups !</strong> La bonne réponse pour <i>"${currentQuestion.target}"</i> était : <strong>${currentQuestion.answer}</strong>.`;
   }
