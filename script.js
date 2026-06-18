@@ -61,6 +61,7 @@ const statsRateEl = document.getElementById("stats-rate");
 const statsChart = document.getElementById("stats-chart");
 const statsSubtitle = statsScreen.querySelector(".subtitle-sheet");
 const periodButtons = Array.from(document.querySelectorAll(".period-btn"));
+const skipBtn = document.getElementById("skip-btn");
 
 const statsKey = "gigagrammaire_progress_stats";
 let statsEntries = [];
@@ -142,7 +143,8 @@ lessonFonctionsBtn.addEventListener("click", () => {
 startBtn.addEventListener("click", startGame);
 quitBtn.addEventListener("click", quitGame);
 hintBtn.addEventListener("click", showHint);
-submitBtn.addEventListener("click", checkAnswers);
+submitBtn.addEventListener("click", () => checkAnswers(false));
+skipBtn.addEventListener("click", () => checkAnswers(true));
 nextBtn.addEventListener("click", loadNewQuestion);
 
 window.addEventListener("keydown", (e) => {
@@ -287,6 +289,7 @@ function loadNewQuestion() {
   nextBtn.classList.add("hidden");
   submitBtn.classList.remove("hidden");
   hintBtn.classList.remove("hidden");
+  skipBtn.classList.remove("hidden"); // On s'assure qu'il n'est pas masqué au départ
 
   // Sécurité si le pool est vide
   if (!questionsPool || questionsPool.length === 0) return;
@@ -318,7 +321,13 @@ function loadNewQuestion() {
   if (typeQuestion.startsWith("nature")) {
     natureGroup.classList.remove("hidden");
     fonctionGroup.classList.add("hidden");
+
+    // Modification du texte de la consigne
     labelNature.innerHTML = `Quelle est la <strong class="enhance-word">nature</strong> du ${isMultiWord ? "groupe de mots" : "mot"} <span class="highlight-nature">"${currentQuestion.target}"</span> ?`;
+
+    // On injecte le bouton Passer directement à la suite du texte du label
+    labelNature.appendChild(skipBtn);
+
     sentenceContainer.innerHTML = currentSentenceText.replace(
       currentQuestion.target,
       `<span class="highlight-nature">${currentQuestion.target}</span>`,
@@ -328,7 +337,13 @@ function loadNewQuestion() {
   } else if (typeQuestion.startsWith("fonction")) {
     natureGroup.classList.add("hidden");
     fonctionGroup.classList.remove("hidden");
+
+    // Modification du texte de la consigne
     labelFonction.innerHTML = `Quelle est la <strong class="enhance-word">fonction</strong> du ${isMultiWord ? "groupe de mots" : "mot"} <span class="highlight-fonction">"${currentQuestion.target}"</span> ?`;
+
+    // On injecte le bouton Passer directement à la suite du texte du label
+    labelFonction.appendChild(skipBtn);
+
     sentenceContainer.innerHTML = currentSentenceText.replace(
       currentQuestion.target,
       `<span class="highlight-fonction">${currentQuestion.target}</span>`,
@@ -403,23 +418,39 @@ function getCompletionHint(answer) {
   return answer;
 }
 
-function checkAnswers() {
+function checkAnswers(isSkipped = false) {
   let userAnswer = "";
   let typeQuestion = currentQuestion.type.trim().toLowerCase();
 
-  // 1. Récupération de la valeur du champ actif
-  if (typeQuestion.startsWith("nature")) {
-    userAnswer = cleanString(inputNature.value);
-  } else {
-    userAnswer = cleanString(inputFonction.value);
-  }
+  // 1. Récupération, nettoyage, conversion et remplacement dans l'input (uniquement si on ne passe pas)
+  if (!isSkipped) {
+    if (typeQuestion.startsWith("nature")) {
+      userAnswer = checkAbreviations(cleanString(inputNature.value));
 
-  // Si le champ est complètement vide
-  if (userAnswer === "") {
-    feedbackZone.className = "feedback-box wrong";
-    feedbackZone.innerHTML = "<strong>Réponse manquante.</strong>";
-    feedbackZone.classList.remove("hidden");
-    return;
+      if (inputNature.value.trim() !== "") {
+        inputNature.value = userAnswer;
+      }
+    } else {
+      userAnswer = checkAbreviations(cleanString(inputFonction.value));
+
+      if (inputFonction.value.trim() !== "") {
+        inputFonction.value = userAnswer;
+      }
+    }
+
+    // Sécurité champ vide
+    if (userAnswer === "") {
+      feedbackZone.className = "feedback-box wrong flash-error";
+      feedbackZone.innerHTML = "<strong>Champ de réponse vide !</strong>";
+      feedbackZone.classList.remove("hidden");
+
+      // Retire l'effet d'ombre après 2.5 secondes pour pouvoir le rejouer si nécessaire
+      setTimeout(() => {
+        feedbackZone.classList.remove("flash-error");
+      }, 900);
+
+      return;
+    }
   }
 
   totalQuestions++;
@@ -427,102 +458,126 @@ function checkAnswers() {
   let isAnIncompleteAnswer = false;
   const expectedAnswer = cleanString(currentQuestion.answer);
 
-  // --- SÉCURITÉ : LISTES DE CONTRÔLE POUR ÉVITER LES FAUX POSITIFS ---
-  const listeNatures = [
-    "adjectif",
-    "nom",
-    "verbe",
-    "determinant",
-    "adverbe",
-    "pronom",
-    "conjonction",
-    "interjection",
-    "gn",
-    "proposition",
-  ];
-  const listeFonctions = [
-    "sujet",
-    "cod",
-    "coi",
-    "cc",
-    "attribut",
-    "apposition",
-    "epithete",
-    "cdn",
-    "complement",
-  ];
+  // 2. LOGIQUE DE VALIDATION SÉCURISÉE (uniquement si on ne passe pas)
+  if (!isSkipped) {
+    const listeNatures = [
+      "adjectif",
+      "nom",
+      "verbe",
+      "determinant",
+      "adverbe",
+      "pronom",
+      "conjonction",
+      "interjection",
+      "gn",
+      "proposition",
+    ];
+    const listeFonctions = [
+      "sujet",
+      "cod",
+      "coi",
+      "cc",
+      "attribut",
+      "apposition",
+      "epithete",
+      "cdn",
+      "complement",
+    ];
 
-  // 2. LOGIQUE DE VALIDATION SÉCURISÉE
-
-  // Cas 1 : Détecter si l'élève confond Nature et Fonction (Erreur fatale -> Faux)
-  if (
-    typeQuestion.startsWith("fonction") &&
-    listeNatures.some(
-      (nature) =>
-        userAnswer.includes(nature) && !expectedAnswer.includes(nature),
-    )
-  ) {
-    isCorrect = false;
-  } else if (
-    typeQuestion.startsWith("nature") &&
-    listeFonctions.some(
-      (fonction) =>
-        userAnswer.includes(fonction) && !expectedAnswer.includes(fonction),
-    )
-  ) {
-    isCorrect = false;
-  }
-  // Cas 2 : Égalité parfaite
-  else if (userAnswer === expectedAnswer) {
-    isCorrect = true;
-  }
-  // Cas 3 : Gestion des réponses VRAIMENT incomplètes (ex: l'élève écrit juste "cc" ou "cdn")
-  else if (
-    isIncompleteAnswer(userAnswer, expectedAnswer) &&
-    userAnswer !== expectedAnswer
-  ) {
-    isAnIncompleteAnswer = true;
-  }
-  // Cas 4 : L'utilisateur est PLUS précis que la bdd (ex: "adjectif qualificatif" pour "adjectif")
-  else if (userAnswer.includes(expectedAnswer)) {
-    isCorrect = true;
-  }
-  // Cas 5 : Raccourcis tolérés
-  else if (
-    expectedAnswer === "adjectif qualificatif" &&
-    userAnswer === "adjectif"
-  ) {
-    isCorrect = true;
-  } else if (
-    expectedAnswer === "conjonction de subordination" &&
-    userAnswer === "conjonction"
-  ) {
-    isCorrect = true;
+    // Cas 1 : Détecter si l'élève confond Nature et Fonction (Erreur fatale -> Faux)
+    if (
+      typeQuestion.startsWith("fonction") &&
+      listeNatures.some(
+        (nature) =>
+          userAnswer.includes(nature) && !expectedAnswer.includes(nature),
+      )
+    ) {
+      isCorrect = false;
+    } else if (
+      typeQuestion.startsWith("nature") &&
+      listeFonctions.some(
+        (fonction) =>
+          userAnswer.includes(fonction) && !expectedAnswer.includes(fonction),
+      )
+    ) {
+      isCorrect = false;
+    }
+    // Cas 2 : Égalité parfaite
+    else if (userAnswer === expectedAnswer) {
+      isCorrect = true;
+    }
+    // Cas 3 : Gestion des réponses VRAIMENT incomplètes (ex: l'élève écrit juste "cc" ou "cdn")
+    else if (
+      isIncompleteAnswer(userAnswer, expectedAnswer) &&
+      userAnswer !== expectedAnswer
+    ) {
+      isAnIncompleteAnswer = true;
+    }
+    // Cas 4 : L'utilisateur est PLUS précis que la bdd (ex: "adjectif qualificatif" pour "adjectif")
+    else if (userAnswer.includes(expectedAnswer)) {
+      isCorrect = true;
+    }
+    // Cas 5 : Raccourcis tolérés
+    else if (
+      expectedAnswer === "adjectif qualificatif" &&
+      userAnswer === "adjectif"
+    ) {
+      isCorrect = true;
+    } else if (
+      expectedAnswer === "conjonction de subordination" &&
+      userAnswer === "conjonction"
+    ) {
+      isCorrect = true;
+    }
   }
 
   // 3. Traitement du résultat et affichage du feedback
-  if (isCorrect) {
+  if (isSkipped) {
+    feedbackZone.className = "feedback-box wrong";
+    feedbackZone.innerHTML = `<strong>Question passée.</strong> La bonne réponse pour <i>"${currentQuestion.target}"</i> était : <strong>${currentQuestion.answer}</strong>.`;
+  } else if (isCorrect) {
     score++;
     const randomCompliment =
       compliments[Math.floor(Math.random() * compliments.length)];
     feedbackZone.className = "feedback-box correct";
     feedbackZone.innerHTML = `<strong>${randomCompliment}</strong> C'est tout à fait ça !`;
   } else if (isAnIncompleteAnswer) {
-    feedbackZone.className = "feedback-box wrong"; // Reste rouge ou orange selon ton CSS
+    feedbackZone.className = "feedback-box wrong";
     feedbackZone.innerHTML = `<strong>Réponse incomplète.</strong> Précise ta réponse comme : <em>${getCompletionHint(currentQuestion.answer)}</em>.`;
   } else {
     feedbackZone.className = "feedback-box wrong";
     feedbackZone.innerHTML = `<strong>Oups !</strong> La bonne réponse pour <i>"${currentQuestion.target}"</i> était : <strong>${currentQuestion.answer}</strong>.`;
   }
 
+  // Mise à jour de l'affichage des boutons
   feedbackZone.classList.remove("hidden");
   submitBtn.classList.add("hidden");
   hintBtn.classList.add("hidden");
+  skipBtn.classList.add("hidden");
   nextBtn.classList.remove("hidden");
 
+  // Enregistrement des statistiques et mise à jour du score
   addStatsEntry(isCorrect);
   addSessionStatsEntry(isCorrect);
   updateScoreDisplay();
+}
+
+function checkAbreviations(input) {
+  const abbreviations = {
+    // les plus importantes
+    det: "determinant",
+    adj: "adjectif",
+    adv: "adverbe",
+    gn: "groupe nominal",
+    "grp prep": "groupe prepositionnel",
+    prep: "preposition",
+    conj: "conjonction",
+    vb: "verbe",
+    pp: "participe passe",
+    cc: "complement circonstanciel",
+    cdn: "complement du nom",
+  };
+  return abbreviations[input] || input;
 }
 
 function getDisplayedStatsEntries() {

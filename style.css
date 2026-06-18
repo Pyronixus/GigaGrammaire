@@ -532,6 +532,37 @@ input[type="text"]:focus {
   gap: 15px;
 }
 
+/* --- BOUTON PASSER ULTRA-DISCRET À CÔTÉ DE LA QUESTION --- */
+.btn-skip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.35);
+  padding: 3px 8px;
+  font-size: 0.75rem; /* Très petit */
+  border-radius: 6px;
+  margin-left: 10px; /* Espace après le point d'interrogation */
+  cursor: pointer;
+  vertical-align: middle;
+  transition: all 0.2s ease;
+  font-weight: normal;
+}
+
+.btn-skip:hover {
+  background: rgba(244, 63, 94, 0.1);
+  border-color: rgba(244, 63, 94, 0.3);
+  color: #fb7185;
+}
+
+/* Réajustement de la zone du bas puisqu'il n'y a plus qu'un bouton */
+.secondary-actions {
+  display: block;
+  width: 100%;
+}
+
 .sentence-box {
   background: rgba(15, 23, 42, 0.9);
   border-left: 4px solid rgba(99, 102, 241, 0.85);
@@ -578,6 +609,26 @@ input[type="text"]:focus {
   background: rgba(244, 63, 94, 0.15);
   border: 1px solid rgba(244, 63, 94, 0.4);
   color: #fb7185;
+}
+
+/* --- EFFET FLASH OMBRE POUR CHAMP VIDE --- */
+.feedback-box.flash-error {
+  box-shadow: 0 0 25px rgba(244, 63, 94, 0.85);
+  animation:
+    slideDown 0.4s ease,
+    pulse-shadow 0.8s ease-in-out forwards;
+}
+
+@keyframes pulse-shadow {
+  0% {
+    box-shadow: 0 0 25px rgba(244, 63, 94, 0.85);
+  }
+  20% {
+    box-shadow: 0 0 35px rgba(244, 63, 94, 1);
+  }
+  100% {
+    box-shadow: 0 0 0px rgba(244, 63, 94, 0);
+  }
 }
 
 /* Bouton suivant stylisé en mode validation */
