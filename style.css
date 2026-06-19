@@ -40,6 +40,10 @@ body {
   z-index: 0;
   opacity: 0.4;
   animation: floatCircles 20s infinite alternate ease-in-out;
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0); /* Force le rendu matériel propre */
 }
 
 .circle-1 {
@@ -307,7 +311,7 @@ h1 {
 }
 
 .btn-primary:active {
-  transform: translateY(-3 px);
+  transform: translateY(-3px);
 }
 
 .btn-secondary {

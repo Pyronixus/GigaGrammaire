@@ -153,7 +153,7 @@ window.addEventListener("keydown", (e) => {
       if (!nextBtn.classList.contains("hidden")) {
         loadNewQuestion();
       } else if (!submitBtn.classList.contains("hidden")) {
-        checkAnswers();
+        checkAnswers(false);
       }
     }
   }
@@ -364,7 +364,7 @@ function cleanString(str) {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[-�'`]/g, "")
+    .replace(/[-'`]/g, "")
     .replace(/[^\w\s]/g, "")
     .replace(/\s+/g, " ");
 }
@@ -422,20 +422,13 @@ function checkAnswers(isSkipped = false) {
   let userAnswer = "";
   let typeQuestion = currentQuestion.type.trim().toLowerCase();
 
-  // 1. Récupération, nettoyage, conversion et remplacement dans l'input (uniquement si on ne passe pas)
+  // 1. Récupération et traitement de la réponse
   if (!isSkipped) {
     if (typeQuestion.startsWith("nature")) {
       userAnswer = checkAbreviations(cleanString(inputNature.value));
-
-      if (inputNature.value.trim() !== "") {
-        inputNature.value = userAnswer;
-      }
+      // CORRECTION : Ne pas écraser brutalement la saisie de l'utilisateur pendant l'affichage du feedback
     } else {
       userAnswer = checkAbreviations(cleanString(inputFonction.value));
-
-      if (inputFonction.value.trim() !== "") {
-        inputFonction.value = userAnswer;
-      }
     }
 
     // Sécurité champ vide
@@ -444,7 +437,6 @@ function checkAnswers(isSkipped = false) {
       feedbackZone.innerHTML = "<strong>Champ de réponse vide !</strong>";
       feedbackZone.classList.remove("hidden");
 
-      // Retire l'effet d'ombre après 2.5 secondes pour pouvoir le rejouer si nécessaire
       setTimeout(() => {
         feedbackZone.classList.remove("flash-error");
       }, 900);
@@ -458,8 +450,9 @@ function checkAnswers(isSkipped = false) {
   let isAnIncompleteAnswer = false;
   const expectedAnswer = cleanString(currentQuestion.answer);
 
-  // 2. LOGIQUE DE VALIDATION SÉCURISÉE (uniquement si on ne passe pas)
+  // 2. LOGIQUE DE VALIDATION
   if (!isSkipped) {
+    // CORRECTION : Listes exhaustives alignées avec cleanString()
     const listeNatures = [
       "adjectif",
       "nom",
@@ -469,56 +462,53 @@ function checkAnswers(isSkipped = false) {
       "pronom",
       "conjonction",
       "interjection",
-      "gn",
+      "groupe nominal",
       "proposition",
+      "preposition",
+      "participe passe",
+      "participe present",
     ];
     const listeFonctions = [
       "sujet",
       "cod",
       "coi",
-      "cc",
+      "complement circonstanciel",
       "attribut",
       "apposition",
       "epithete",
+      "complement du nom",
+      "complement de lantecedent",
+      "complement dagent",
       "cdn",
-      "complement",
     ];
 
-    // Cas 1 : Détecter si l'élève confond Nature et Fonction (Erreur fatale -> Faux)
-    if (
-      typeQuestion.startsWith("fonction") &&
-      listeNatures.some(
-        (nature) =>
-          userAnswer.includes(nature) && !expectedAnswer.includes(nature),
-      )
-    ) {
-      isCorrect = false;
-    } else if (
-      typeQuestion.startsWith("nature") &&
-      listeFonctions.some(
-        (fonction) =>
-          userAnswer.includes(fonction) && !expectedAnswer.includes(fonction),
-      )
-    ) {
-      isCorrect = false;
+    let aConfondu = false;
+
+    if (typeQuestion.startsWith("fonction")) {
+      aConfondu = listeNatures.some((nature) => {
+        const regex = new RegExp(`\\b${nature}\\b`, "i");
+        return regex.test(userAnswer) && !expectedAnswer.includes(nature);
+      });
+    } else if (typeQuestion.startsWith("nature")) {
+      aConfondu = listeFonctions.some((fonction) => {
+        const regex = new RegExp(`\\b${fonction}\\b`, "i");
+        return regex.test(userAnswer) && !expectedAnswer.includes(fonction);
+      });
     }
-    // Cas 2 : Égalité parfaite
-    else if (userAnswer === expectedAnswer) {
+
+    // CORRECTION : Utilisation de conditions distinctes pour ne pas bloquer l'évaluation
+    if (aConfondu) {
+      isCorrect = false;
+    } else if (userAnswer === expectedAnswer) {
       isCorrect = true;
-    }
-    // Cas 3 : Gestion des réponses VRAIMENT incomplètes (ex: l'élève écrit juste "cc" ou "cdn")
-    else if (
+    } else if (
       isIncompleteAnswer(userAnswer, expectedAnswer) &&
       userAnswer !== expectedAnswer
     ) {
       isAnIncompleteAnswer = true;
-    }
-    // Cas 4 : L'utilisateur est PLUS précis que la bdd (ex: "adjectif qualificatif" pour "adjectif")
-    else if (userAnswer.includes(expectedAnswer)) {
+    } else if (userAnswer.includes(expectedAnswer)) {
       isCorrect = true;
-    }
-    // Cas 5 : Raccourcis tolérés
-    else if (
+    } else if (
       expectedAnswer === "adjectif qualificatif" &&
       userAnswer === "adjectif"
     ) {
@@ -549,14 +539,12 @@ function checkAnswers(isSkipped = false) {
     feedbackZone.innerHTML = `<strong>Oups !</strong> La bonne réponse pour <i>"${currentQuestion.target}"</i> était : <strong>${currentQuestion.answer}</strong>.`;
   }
 
-  // Mise à jour de l'affichage des boutons
   feedbackZone.classList.remove("hidden");
   submitBtn.classList.add("hidden");
   hintBtn.classList.add("hidden");
   skipBtn.classList.add("hidden");
   nextBtn.classList.remove("hidden");
 
-  // Enregistrement des statistiques et mise à jour du score
   addStatsEntry(isCorrect);
   addSessionStatsEntry(isCorrect);
   updateScoreDisplay();
@@ -564,18 +552,26 @@ function checkAnswers(isSkipped = false) {
 
 function checkAbreviations(input) {
   const abbreviations = {
-    // les plus importantes
+    // Natures
     det: "determinant",
     adj: "adjectif",
     adv: "adverbe",
     gn: "groupe nominal",
-    "grp prep": "groupe prepositionnel",
     prep: "preposition",
+    "grp prep": "groupe prepositionnel",
     conj: "conjonction",
     vb: "verbe",
     pp: "participe passe",
+    prop: "proposition",
+
+    // Fonctions
+    suj: "sujet",
+    cod: "complement dobjet direct", // Aligné avec le cleanString potentiel
+    coi: "complement dobjet indirect",
     cc: "complement circonstanciel",
     cdn: "complement du nom",
+    attr: "attribut",
+    epith: "epithete",
   };
   return abbreviations[input] || input;
 }
