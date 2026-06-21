@@ -695,7 +695,7 @@ function drawStatsChart() {
 
   const title = `Période : ${selectedStatsPeriod}`;
   ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-  ctx.font = "16px Plus Jakarta Sans, sans-serif";
+  ctx.font = "16px Quicksand, sans-serif";
   ctx.fillText(title, 18, 28);
 
   const gridColor = "rgba(255, 255, 255, 0.12)";
@@ -717,7 +717,7 @@ function drawStatsChart() {
   ctx.stroke();
 
   ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-  ctx.font = "12px Plus Jakarta Sans, sans-serif";
+  ctx.font = "12px Quicksand, sans-serif";
   for (let i = 0; i <= 4; i++) {
     const value = 100 - i * 25;
     ctx.fillText(`${value}%`, 8, 54 + (i * (height - 80)) / 4);
@@ -725,7 +725,7 @@ function drawStatsChart() {
 
   if (filtered.length === 0) {
     ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-    ctx.font = "16px Plus Jakarta Sans, sans-serif";
+    ctx.font = "16px Quicksand, sans-serif";
     ctx.fillText("Aucune donnée pour cette période.", 40, height / 2);
     return;
   }
@@ -771,7 +771,7 @@ function drawStatsChart() {
   ctx.fill();
 
   ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-  ctx.font = "12px Plus Jakarta Sans, sans-serif";
+  ctx.font = "12px Quicksand, sans-serif";
   ctx.fillText(
     new Date(startTime).toLocaleDateString("fr-FR", {
       month: "short",
