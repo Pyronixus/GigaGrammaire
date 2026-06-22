@@ -14,10 +14,13 @@
     />
   </head>
   <body>
-    <!-- Bulles animées en arrière-plan -->
-    <div class="bg-blur-circle circle-1"></div>
-    <div class="bg-blur-circle circle-2"></div>
-    <div class="bg-blur-circle circle-3"></div>
+    <div class="bg-blur-container">
+      <div class="bg-blur-circle circle-1"></div>
+      <div class="bg-blur-circle circle-2"></div>
+      <div class="bg-blur-circle circle-3"></div>
+    </div>
+
+    <div class="container"></div>
 
     <div class="container">
       <!-- MENU PRINCIPAL -->
@@ -25,7 +28,10 @@
         <div class="logo-icon">
           <img id="logo" src="assets/logo.png" alt="Logo GigaGrammaire" />
         </div>
-        <h1 class="glow">GigaGrammaire</h1>
+        <h1 class="glow" id="typewriter-title">
+          <span id="typewriter-text"></span
+          ><span class="typewriter-cursor">|</span>
+        </h1>
         <p class="subtitle">Que veux-tu faire aujourd'hui ?</p>
 
         <div class="main-options">
@@ -39,7 +45,11 @@
             📊 Voir les Statistiques
           </button>
         </div>
-        <div id="progress-summary" class="stats-summary" style="margin-top: 18px;">
+        <div
+          id="progress-summary"
+          class="stats-summary"
+          style="margin-top: 18px"
+        >
           ✅ (sauvegardé) aucune donnée pour l’instant.
         </div>
       </div>
@@ -113,9 +123,7 @@
           <div class="sheet-item">
             <strong>🔹 GN (Groupe Nominal)</strong>
             Ensemble de mots centré sur un nom noyau.
-            <span class="item-example"
-              >Ex : <i>La voiture de mon père</i></span
-            >
+            <span class="item-example">Ex : <i>La voiture de mon père</i></span>
           </div>
           <div class="sheet-item">
             <strong>🔹 Groupe prépositionnel</strong>
@@ -141,22 +149,34 @@
           </div>
           <div class="sheet-item">
             <strong>🔹 Adverbe</strong>
-            Mot invariable qui modifie le sens d'un verbe, adjectif ou autre adverbe.
+            Mot invariable qui modifie le sens d'un verbe, adjectif ou autre
+            adverbe.
             <span class="item-example"><i>très, rapidement, hier</i></span>
           </div>
           <div class="sheet-item">
             <strong>🔹 Conjonction</strong>
             Mot invariable reliant deux éléments.
             <span class="item-example"
-              >Coordination : <i>mais, où, et, donc, or, ni, car <br> Mémo : Mais où est donc Ornicar ?</i> • Subordination :
-              <i>que, si, comme, quand, lorsque et tous les mots finissant en -que</i></span
+              >Coordination :
+              <i
+                >mais, où, et, donc, or, ni, car <br />
+                Mémo : Mais où est donc Ornicar ?</i
+              >
+              • Subordination :
+              <i
+                >que, si, comme, quand, lorsque et tous les mots finissant en
+                -que</i
+              ></span
             >
           </div>
           <div class="sheet-item">
             <strong>🔹 Préposition</strong>
             Petit mot invariable introduisant un complément.
             <span class="item-example"
-              ><i>à, dans, par, pour, en, vers, avec, de, sans, sous, sur <br> Mémo : Adam part pour envers avec deux-cent sous sûrs.</i></span
+              ><i
+                >à, dans, par, pour, en, vers, avec, de, sans, sous, sur <br />
+                Mémo : Adam part pour envers avec deux-cent sous sûrs.</i
+              ></span
             >
           </div>
           <div class="sheet-item">
@@ -206,7 +226,9 @@
           <div class="sheet-item">
             <strong>🔸 Attribut du sujet</strong>
             Exprime une caractéristique du sujet via un verbe d'état.
-            <span class="item-example">Ex : <i>Il est beau, Il semble intelligent.</i></span>
+            <span class="item-example"
+              >Ex : <i>Il est beau, Il semble intelligent.</i></span
+            >
           </div>
           <div class="sheet-item">
             <strong>🔸 Complément circonstanciel (CC)</strong>
@@ -239,7 +261,8 @@
             <strong>🔸 Complément d'agent</strong>
             Dans une phrase passive, c'est celui qui fait réellement l'action.
             <span class="item-example"
-              >Ex : Le livre est lu <i>par le lecteur (active: le lecteur lit le livre)</i></span
+              >Ex : Le livre est lu
+              <i>par le lecteur (active: le lecteur lit le livre)</i></span
             >
           </div>
           <div class="sheet-item">
@@ -265,7 +288,8 @@
             <strong>🔸 CDN (Complément du Nom)</strong>
             Groupe prépositionnel qui complète un nom.
             <span class="item-example"
-              >Ex : Une tasse <i>de café</i>, un personnage <i>de fiction</i></span
+              >Ex : Une tasse <i>de café</i>, un personnage
+              <i>de fiction</i></span
             >
           </div>
         </div>
@@ -345,9 +369,11 @@
 
           <div class="actions">
             <button id="submit-btn" class="btn-primary">Vérifier ✨</button>
-            <button id="hint-btn" class="btn-secondary">Un indice ? 💡</button> 
+            <button id="hint-btn" class="btn-secondary">Un indice ? 💡</button>
           </div>
-          <button id="skip-btn" class="btn-secondary btn-skip">Passer ⏭</button>
+          <button id="skip-btn" class="btn-secondary btn-skip">
+            Passer ⏭
+          </button>
         </div>
 
         <div id="hint-zone" class="hint-box hidden"></div>

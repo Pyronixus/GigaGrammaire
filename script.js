@@ -799,3 +799,57 @@ function drawStatsChart() {
 function updateScoreDisplay() {
   progressTrack.textContent = `Score : ${score}/${totalQuestions}`;
 }
+
+// --- ANIMATION TYPEWRITER POUR LE TITRE (VERSION RAPIDE) ---
+document.addEventListener("DOMContentLoaded", () => {
+  const textContainer = document.getElementById("typewriter-text");
+  const cursor = document.querySelector(".typewriter-cursor");
+
+  if (!textContainer) return;
+
+  const correctText = "GigaGrammaire";
+  const errorText = "GigaGramaire"; // Un seul 'm'
+
+  let index = 0;
+  let isDeleting = false;
+
+  function typeEffect() {
+    if (!isDeleting && index <= errorText.length) {
+      // Étape 1 : Écriture rapide de la faute (100ms par lettre)
+      textContainer.textContent = errorText.substring(0, index);
+      index++;
+      setTimeout(typeEffect, 100);
+    } else if (!isDeleting && index > errorText.length) {
+      // Petite pause de 500ms quand il réalise l'erreur
+      isDeleting = true;
+      setTimeout(typeEffect, 500);
+    } else if (isDeleting && textContainer.textContent !== "GigaGra") {
+      // Étape 2 : Retour en arrière ultra rapide (50ms par lettre)
+      textContainer.textContent = errorText.substring(0, index - 1);
+      index--;
+      setTimeout(typeEffect, 50);
+    } else if (isDeleting && textContainer.textContent === "GigaGra") {
+      // Très courte pause de 200ms avant de repartir
+      isDeleting = false;
+      index = "GigaGra".length;
+      setTimeout(typeCorrectText, 200);
+    }
+  }
+
+  function typeCorrectText() {
+    if (index <= correctText.length) {
+      // Étape 3 : Réécriture correcte et fluide (90ms par lettre)
+      textContainer.textContent = correctText.substring(0, index);
+      index++;
+      setTimeout(typeCorrectText, 90);
+    } else {
+      // Fin : Le curseur reste statique/disparaît rapidement après 2 secondes
+      setTimeout(() => {
+        if (cursor) cursor.style.display = "none";
+      }, 2000);
+    }
+  }
+
+  // Lancement global de l'effet 300ms après le chargement de la page
+  setTimeout(typeEffect, 300);
+});

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap");
 
 /* --- CONFIGURATION GLOBALE --- */
 :root {
@@ -27,6 +27,7 @@ body {
   background: var(--bg-gradient);
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   color: var(--text-main);
@@ -34,52 +35,90 @@ body {
   position: relative;
 }
 
-/* --- ANIMATIONS DE FOND (LIQUID GLASS) --- */
+/* --- ANIMATIONS DE FOND (LIQUID GLASS OPTIMISÉ) --- */
+
+/* 1. Le conteneur parent qui applique le flou UNE SEULE FOIS pour tout le monde */
+.bg-blur-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  filter: blur(80px); /* Le flou est appliqué ici, plus sur les cercles ! */
+  transform: translateZ(0); /* Rendu matériel activé sur le conteneur */
+  backface-visibility: hidden;
+}
+
+/* 2. Les cercles simplifiés au maximum (sans filter, sans box-shadow) */
 .bg-blur-circle {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  z-index: 0;
-  opacity: 0.4;
-  animation: floatCircles 20s infinite alternate ease-in-out;
+  opacity: 0.35; /* Légèrement réduit pour compenser la netteté sous le flou */
   will-change: transform;
-  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  transform: translateZ(0); /* Force le rendu matériel propre */
 }
 
 .circle-1 {
-  width: 400px;
-  height: 400px;
+  width: 40vw;
+  height: 40vw;
+  max-width: 400px;
+  max-height: 400px;
   background: #4f46e5;
   top: -10%;
   left: -10%;
+  animation: floatCircle1 22s infinite alternate ease-in-out;
 }
 
 .circle-2 {
-  width: 500px;
-  height: 500px;
+  width: 50vw;
+  height: 50vw;
+  max-width: 500px;
+  max-height: 500px;
   background: #db2777;
-  bottom: -20%;
+  bottom: -15%;
   right: -10%;
-  animation-delay: -5s;
+  animation: floatCircle2 26s infinite alternate ease-in-out;
 }
 
 .circle-3 {
-  width: 300px;
-  height: 300px;
+  width: 30vw;
+  height: 30vw;
+  max-width: 300px;
+  max-height: 300px;
   background: #06b6d4;
   top: 40%;
-  right: 20%;
-  animation-delay: -10s;
+  right: 15%;
+  animation: floatCircle3 20s infinite alternate ease-in-out;
 }
 
-@keyframes floatCircles {
+/* 3. Des animations distinctes avec des trajectoires en % pour éviter les saccades */
+@keyframes floatCircle1 {
   0% {
-    transform: translateY(0) scale(1);
+    transform: translate(0, 0) scale(1);
   }
   100% {
-    transform: translateY(50px) scale(1.1);
+    transform: translate(8%, 12%) scale(1.05);
+  }
+}
+
+@keyframes floatCircle2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(-10%, -8%) scale(1.08);
+  }
+}
+
+@keyframes floatCircle3 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(-5%, 10%) scale(1.05);
   }
 }
 
@@ -161,47 +200,34 @@ body {
 
 .glow {
   position: relative;
-  display: block;
-  transition: filter 1s ease; /* Transition fluide pour la lueur */
+  display: flex; /* Aligne le texte et le curseur sur la même ligne */
+  align-items: center;
+  justify-content: center;
   cursor: default;
+  width: 100%; /* Force le titre à prendre toute la ligne pour que le logo reste au-dessus */
+  margin-top: 15px; /* Optionnel : rajoute un petit espace sous le logo */
 }
 
-/* Effet au survol : On active le dégradé animé ET la lueur parfaite */
+/* Léger effet de survol au besoin */
 .glow:hover {
-  background: linear-gradient(
-    45deg,
-    #ff0000,
-    #ff7300,
-    #fffb00,
-    #48ff00,
-    #00ffd5,
-    #002bff,
-    #ff00c8,
-    #ff0000
-  );
-  background-size: 600%;
-  -webkit-background-clip: text; /* Découpe le fond selon la forme des lettres */
-  background-clip: text;
-
-  /* L'ANIMATION DU TEXTE */
-  animation: glowingText 10s linear infinite;
-
-  /* LA LUEUR PARFAITE : Elle suit les contours des lettres */
-  /* On superpose deux ombres pour intensifier l'effet sans faire de gros paquets */
-  filter: drop-shadow(0 0 8px rgba(255, 115, 0, 0.6))
-    drop-shadow(0 0 20px rgba(0, 255, 213, 0.4));
+  filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.4));
+  transition: filter 0.3s ease;
 }
 
-/* Animation unique pour faire défiler le dégradé dans le texte */
-@keyframes glowingText {
-  0% {
-    background-position: 0% 50%;
+/* Style du curseur vertical */
+.typewriter-cursor {
+  color: var(--primary-color);
+  font-weight: 300;
+  margin-left: 4px;
+  animation: blinkCursor 0.7s infinite alternate;
+}
+
+@keyframes blinkCursor {
+  from {
+    opacity: 1;
   }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
+  to {
+    opacity: 0;
   }
 }
 
